@@ -1,0 +1,11 @@
+Options -Indexes
+ServerSignature Off
+RewriteEngine On
+
+# Keep the front controller in /public while application links use clean root-domain URLs.
+RewriteRule ^(?!public(?:/|$))(.*)$ public/$1 [L]
+
+# Never expose dotfiles such as .env if the project root is the web root.
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>

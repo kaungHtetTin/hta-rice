@@ -1,0 +1,8 @@
+/.env
+/storage/logs/*.log
+/storage/*.log
+/storage/i18n-qa/
+/storage/cache/*
+!/storage/cache/.gitkeep
+/storage/branding/*
+!/storage/branding/.gitkeep

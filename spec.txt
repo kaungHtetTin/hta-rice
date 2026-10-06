@@ -1,0 +1,28 @@
+I want to build mini stats app for my business
+It will include basic auth system for staff and super admin
+
+My business it that
+I buy rice with 'တင်း' unit from my supplier
+I have multiple warehouses to store my rice or inventory
+
+I want to import stock to my warehouses when I purchase rice from supplier and I want to print voucher
+I want to transfer stock among my warehouses
+I want to see the latest inventory balances in my warehouses
+
+I want to see the purchase amount report by month , by year, or by specifc duration , by warehouse, by all warehouse with proper bar chart
+you can use ready to use jquery chart lib for this. 
+
+When I reduce the inventory balance for production
+I just want a form for go production and simply reduce the balacne.
+You don't need to think about any financa balance for this. 
+
+make role and permission for owner and staff
+
+key requirement is 
+stock import or purchase,
+print voucher for purchase
+record purchase amount
+review purchase amount report
+reduce stock balance in production submit
+
+role and permission for user account
