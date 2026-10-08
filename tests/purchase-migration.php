@@ -29,6 +29,9 @@ try {
     $standalone=DB::insert('movements',['kind'=>'production','warehouse_id'=>$warehouse,'rice_type_id'=>$rice,'quantity'=>'1','occurred_on'=>'2026-10-02','notes'=>'Identical legacy notes','user_id'=>$user,'request_key'=>bin2hex(random_bytes(32))]);
     $beforeStock=DB::fetchAll('SELECT * FROM inventory');
     $migration=require BASE_PATH.'/migrations/20261006_006_operation_crud.php';foreach($migration['up'] as $sql)DB::connection()->exec($sql);
+    $pricingMigration=require BASE_PATH.'/migrations/20261008_007_purchase_bag_price_lb.php';foreach($pricingMigration['up'] as $sql)DB::connection()->exec($sql);
+    $legacyItem=DB::fetch('SELECT * FROM purchase_items WHERE purchase_id=?',[$purchase]);
+    checkMigration($legacyItem['quantity_bag']===null && $legacyItem['price_lb']==='0.00' && $legacyItem['amount']==='260.72','New pricing columns preserve historical purchase amounts and unknown bag counts');
     foreach($groups as $kind=>$ids)checkMigration(array_map('intval',array_column(DB::fetchAll('SELECT operation_id FROM movements WHERE id IN ('.implode(',',$ids).') ORDER BY id'),'operation_id'))===array_fill(0,3,$ids[0]),'Migration groups legacy '.$kind.' rows by item keys, including the 50th item');
     checkMigration((int)DB::fetchValue('SELECT operation_id FROM movements WHERE id=?',[$standalone])===$standalone && DB::fetchValue('SELECT operation_id FROM movements WHERE purchase_id=?',[$purchase])===null && DB::fetchAll('SELECT * FROM inventory')===$beforeStock,'Migration preserves independent legacy operations and current inventory');
 } finally {

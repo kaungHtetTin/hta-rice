@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     function money(value){const digits=decimal(value,2).split('.');return BigInt(digits[0]).toLocaleString('en-US')+'.'+digits[1];}
     function quantity(value){return value<0n?'-'+quantity(-value):decimal(value,3).replace(/\.?0+$/,'');}
     function selected(select){return select.value?select.options[select.selectedIndex].textContent:'';}
-    function lineAmount(row){return (scaled(field(row,'quantity').value,3)*scaled(field(row,'unit_price').value,2)+500n)/1000n;}
+    function lineAmount(row){return (scaled(field(row,'quantity').value,3)*scaled(field(row,'unit_price').value,2)+scaled(field(row,'weight_lb').value,3)*scaled(field(row,'price_lb').value,2)+500n)/1000n;}
     function stockBalance(warehouse,row){
         const value=String(balances.get(warehouse+':'+field(row,'rice_type_id').value)||'0');
         // Edit previews remove the original operation; a destination can be below zero
@@ -46,8 +46,8 @@ document.addEventListener('DOMContentLoaded',()=>{
             const duplicate=riceSelect.value!==''&&selectedElsewhere.has(riceSelect.value);
             row.querySelector('.search-select-input')?.setCustomValidity(duplicate?t('This rice type is already selected in another item.'):(riceSelect.value?'':t('Select an item from the list.')));
             riceSelect.dispatchEvent(new Event('search-select:refresh'));
-            (stockOnly?['quantity']:['quantity','weight_lb','unit_price']).forEach(name=>{
-                const control=field(row,name),places=name==='unit_price'?2:3;
+            (stockOnly?['quantity']:['quantity','quantity_bag','weight_lb','unit_price','price_lb']).forEach(name=>{
+                const control=field(row,name),places=['unit_price','price_lb'].includes(name)?2:3;
                 control.setCustomValidity(control.value!==''&&!new RegExp('^\\d{1,9}(?:\\.\\d{1,'+places+'})?$').test(control.value)?t('Enter a number with up to {places} decimal places.',{places}):'');
             });
             row.querySelector('.item-number').textContent=index+1;
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         rows().forEach(row=>{
             const tr=document.createElement('tr');
             const used=scaled(field(row,'quantity').value,3);
-            const cells=stockOnly?[selected(field(row,'rice_type_id')),quantity(available(row)),quantity(used),quantity(available(row)-used)]:[selected(field(row,'rice_type_id')),quantity(used),field(row,'weight_lb').value?quantity(scaled(field(row,'weight_lb').value,3)):'—',money(scaled(field(row,'unit_price').value,2)),money(lineAmount(row))];
+            const cells=stockOnly?[selected(field(row,'rice_type_id')),quantity(available(row)),quantity(used),quantity(available(row)-used)]:[selected(field(row,'rice_type_id')),quantity(used),field(row,'quantity_bag').value?quantity(scaled(field(row,'quantity_bag').value,3)):'—',field(row,'weight_lb').value?quantity(scaled(field(row,'weight_lb').value,3)):'—',money(scaled(field(row,'unit_price').value,2)),money(scaled(field(row,'price_lb').value,2)),money(lineAmount(row))];
             if(transfer)cells.push(quantity(destinationBalance(row)),quantity(destinationBalance(row)+used));
             cells.forEach((text,index)=>{
                 const td=document.createElement('td');td.textContent=text;if(index)td.className='number';tr.append(td);

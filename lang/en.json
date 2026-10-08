@@ -722,5 +722,8 @@
   "⇄ Transfer stock": "⇄ Transfer stock",
   "＋ Add": "＋ Add",
   "＋ Add {type}": "＋ Add {type}",
-  "＋ New purchase": "＋ New purchase"
+  "＋ New purchase": "＋ New purchase",
+  "Qty (အိတ်)": "Qty (အိတ်)",
+  "Price / lb": "Price / lb",
+  "Amount = quantity (tin) × price/tin + weight (lb) × price/lb. Bag quantity is recorded per item.": "Amount = quantity (tin) × price/tin + weight (lb) × price/lb. Bag quantity is recorded per item."
 }

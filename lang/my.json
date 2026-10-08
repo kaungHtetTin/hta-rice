@@ -722,5 +722,8 @@
   "⇄ Transfer stock": "⇄ ကုန်လွှဲပြောင်းမည်",
   "＋ Add": "＋ ထည့်မည်",
   "＋ Add {type}": "＋ {type} ထည့်မည်",
-  "＋ New purchase": "＋ ဝယ်ယူမှုအသစ်"
+  "＋ New purchase": "＋ ဝယ်ယူမှုအသစ်",
+  "Qty (အိတ်)": "အရေအတွက် (အိတ်)",
+  "Price / lb": "ဈေး / ပေါင်",
+  "Amount = quantity (tin) × price/tin + weight (lb) × price/lb. Bag quantity is recorded per item.": "ကျသင့်ငွေ = တင်းအရေအတွက် × တင်းဈေး + ပေါင်အလေးချိန် × ပေါင်ဈေး။ အိတ်အရေအတွက်ကို ဆန်တစ်မျိုးစီအလိုက် မှတ်တမ်းတင်ပါ။"
 }

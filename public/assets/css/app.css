@@ -37,7 +37,7 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}bu
 .purchase-items-table .search-select input.search-select-input{padding-right:22px}.purchase-items-table .search-select::after{right:7px;font-size:12px}.purchase-items-table input::placeholder{font-size:10px}
 .purchase-items-table input[type=number]{text-align:right;appearance:textfield;-moz-appearance:textfield;font-variant-numeric:tabular-nums}.purchase-items-table input[type=number]::-webkit-inner-spin-button,.purchase-items-table input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 .purchase-items-table td:focus-within{outline:2px solid var(--primary);outline-offset:-2px;background:var(--primary-soft)}
-.purchase-items-table input:focus,.purchase-items-table input:focus-visible,.purchase-items-table select:focus{outline:none;border:0;box-shadow:none}
+.admin-root .purchase-items-table :is(input:not([type="checkbox"]):not([type="radio"]),select,textarea):is(:focus,:focus-visible){outline:none;outline-offset:0;border:0;box-shadow:none}
 .purchase-items-table td:nth-child(6){padding:4px 6px;background:var(--soft)}.purchase-items-table output{display:block;font-variant-numeric:tabular-nums;white-space:normal;overflow-wrap:anywhere;font-weight:600}
 .purchase-items-table td.table-actions{padding:0;text-align:center;background:var(--surface)}.purchase-items-table .remove-item{display:flex;width:100%;height:var(--grid-control);min-height:0;margin:0;padding:0;border:0;border-radius:0;background:transparent;color:var(--muted);font-size:18px;line-height:1}.purchase-items-table .remove-item:hover:not(:disabled){background:var(--soft);color:var(--danger)}
 .grid-keyboard-help{margin:8px 3px 0;font-size:10px}
@@ -113,3 +113,6 @@ html[lang=my] .nav-label{letter-spacing:0;font-size:10px}
 html[lang=my] .button{line-height:1.5}
 .topbar-left{min-width:0}.breadcrumb{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media(max-width:480px){.topbar-actions{gap:4px}.topbar .language-switch{gap:3px}.topbar .language-switch label{width:67px}.topbar .language-switch .button{padding-inline:6px;font-size:10px}.topbar .avatar{display:none}}
+
+.purchase-pricing-table{min-width:810px}.purchase-pricing-table th:nth-child(2){width:auto}.purchase-pricing-table th:nth-child(3),.purchase-pricing-table th:nth-child(4),.purchase-pricing-table th:nth-child(5){width:80px}.purchase-pricing-table th:nth-child(6),.purchase-pricing-table th:nth-child(7){width:104px}.purchase-pricing-table th:nth-child(8){width:108px}.purchase-pricing-table td:nth-child(6){padding:0;background:var(--surface)}.purchase-pricing-table td:nth-child(8){padding:4px 6px;background:var(--soft)}
+.purchase-items-wrap{padding-bottom:8px}

@@ -55,6 +55,14 @@ document.addEventListener('DOMContentLoaded',()=>{
         assert.equal(rowField(first,'quantity').value,'2.125','Grid navigation does not change numeric values');
         rowField(second,'quantity').dispatchEvent(new window.KeyboardEvent('keydown',{key:'Enter',shiftKey:true,bubbles:true,cancelable:true}));
         assert.equal(document.activeElement,rowField(first,'quantity'),'Shift+Enter moves to the previous row');
+        input(rowField(first,'weight_lb'),'0.002');input(rowField(first,'price_lb'),'1.99');input(rowField(first,'quantity_bag'),'7');
+        assert.equal(first.querySelector('.item-amount').textContent,'21.79','Tin and pound charges are summed before rounding');
+        assert.equal(document.getElementById('wizard-amount').textContent,'90.95 MMK');
+        document.getElementById('purchase-next').click();
+        const reviewCells=document.querySelector('#purchase-review-items tr').children;
+        assert.equal(reviewCells[2].textContent,'7');assert.equal(reviewCells[5].textContent,'1.99');assert.equal(reviewCells[6].textContent,'21.79');
+        document.getElementById('purchase-back').click();
+        input(rowField(first,'weight_lb'),'');input(rowField(first,'price_lb'),'');
         assert.equal(document.getElementById('wizard-amount').textContent,'90.94 MMK');
         document.getElementById('purchase-next').click();assert.equal(panes[2].hidden,false);assert.equal(document.querySelectorAll('#purchase-review-items tr').length,2);
         assert.equal(form.querySelectorAll('.purchase-item')[1],second,'Wizard retains entered DOM rows');

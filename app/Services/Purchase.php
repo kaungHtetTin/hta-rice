@@ -25,11 +25,11 @@ final class Purchase
         foreach(array_values($submitted) as $index=>$row){
             try {
                 if(!is_array($row))throw new InvalidArgumentException(t('Invalid rice item.'));
-                foreach(['rice_type_id','quantity','unit_price','weight_lb'] as $field){if(isset($row[$field])&&!is_scalar($row[$field]))throw new InvalidArgumentException(t('Invalid item input.'));}
+                foreach(['rice_type_id','quantity','unit_price','weight_lb','price_lb','quantity_bag'] as $field){if(isset($row[$field])&&!is_scalar($row[$field]))throw new InvalidArgumentException(t('Invalid item input.'));}
                 $rice=$row['rice_type_id']??'';
                 if(filter_var($rice,FILTER_VALIDATE_INT)===false||(int)$rice<1)throw new InvalidArgumentException(t('Select a rice type.'));
                 if(in_array((int)$rice,array_column($items,'rice_type_id'),true))throw new InvalidArgumentException(t('This rice type is already selected. Use one item per rice type.'));
-                $items[]=['rice_type_id'=>(int)$rice,'quantity'=>decimal_value(trim((string)($row['quantity']??'')),3),'unit_price'=>decimal_value(trim((string)($row['unit_price']??'')),2),'weight_lb'=>isset($row['weight_lb'])&&trim((string)$row['weight_lb'])!==''?decimal_value(trim((string)$row['weight_lb']),3):null];
+                $items[]=['rice_type_id'=>(int)$rice,'quantity'=>decimal_value(trim((string)($row['quantity']??'')),3),'unit_price'=>decimal_value(trim((string)($row['unit_price']??'')),2),'price_lb'=>decimal_value(trim((string)($row['price_lb']??'0'))?:'0',2,true),'quantity_bag'=>isset($row['quantity_bag'])&&trim((string)$row['quantity_bag'])!==''?decimal_value(trim((string)$row['quantity_bag']),3,true):null,'weight_lb'=>isset($row['weight_lb'])&&trim((string)$row['weight_lb'])!==''?decimal_value(trim((string)$row['weight_lb']),3):null];
             } catch(InvalidArgumentException $error){throw new InvalidArgumentException(t('Item ').($index+1).': '.$error->getMessage());}
         }
         $warehouse=(int)$data['warehouse_id'];$supplier=(int)$data['supplier_id'];
@@ -54,7 +54,7 @@ final class Purchase
                 $key=$original['request_key'];
             } else $id=DB::insert('purchases',$header);
             foreach($items as $index=>$item){
-                $item['amount']=DB::fetchValue('SELECT ROUND(CAST(? AS DECIMAL(16,3))*CAST(? AS DECIMAL(16,2)),2)',[$item['quantity'],$item['unit_price']]);
+                $item['amount']=DB::fetchValue('SELECT ROUND(CAST(? AS DECIMAL(16,3))*CAST(? AS DECIMAL(16,2))+CAST(? AS DECIMAL(16,3))*CAST(? AS DECIMAL(16,2)),2)',[$item['quantity'],$item['unit_price'],$item['weight_lb']??'0',$item['price_lb']]);
                 DB::insert('purchase_items',['purchase_id'=>$id]+$item);
                 if(!$edit)DB::statement('UPDATE inventory SET quantity=quantity+? WHERE warehouse_id=? AND rice_type_id=?',[$item['quantity'],$warehouse,$item['rice_type_id']]);
                 DB::insert('movements',['kind'=>'purchase','warehouse_id'=>$warehouse,'destination_id'=>null,'rice_type_id'=>$item['rice_type_id'],'quantity'=>$item['quantity'],'occurred_on'=>$date,'notes'=>$notes,'purchase_id'=>$id,'user_id'=>$user,'request_key'=>$index===0?$key:hash('sha256',$key.':item:'.$index)]);

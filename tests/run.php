@@ -287,6 +287,33 @@ try {
     check(request('/profile')['location']==='/login','Old password no longer signs in');
     $login=request('/login');request('/login',['_token'=>token($login),'email'=>'newstaff@example.test','password'=>$passwordData['new_password']]);check(request('/profile')['status']===200,'New password signs in without trimming significant spaces');
     DB::statement('UPDATE users SET active=0 WHERE id=?',[$staffId]);check(request('/inventory')['location']==='/login','Disabled account loses existing-session access');
+    $login=request('/login');request('/login',['_token'=>token($login),'email'=>'owner@example.test','password'=>'test-owner-password']);
+    $poundSupplier=DB::insert('suppliers',['name'=>'Pound pricing supplier']);
+    $poundWarehouse=DB::insert('warehouses',['name'=>'Pound pricing warehouse']);
+    $poundData=['warehouse_id'=>$poundWarehouse,'supplier_id'=>$poundSupplier,'request_key'=>bin2hex(random_bytes(32)),'occurred_on'=>'2026-10-08','amount_paid'=>'10','items'=>[
+        ['rice_type_id'=>$rice,'quantity'=>'2.125','unit_price'=>'10.25','weight_lb'=>'0.002','price_lb'=>'1.99','quantity_bag'=>'7'],
+        ['rice_type_id'=>$multiRice,'quantity'=>'3','unit_price'=>'20','weight_lb'=>'5','price_lb'=>'2.50','quantity_bag'=>'9']
+    ]];
+    $poundId=\App\Services\Purchase::record($poundData,$owner);
+    $poundItems=\App\Services\Purchase::items($poundId);
+    check(array_column($poundItems,'amount')===['21.79','72.50'] && array_column($poundItems,'quantity_bag')===['7.000','9.000'] && array_column($poundItems,'price_lb')===['1.99','2.50'],'Each purchase line saves bags and pound price and rounds the combined tin and pound charges once');
+    check(DB::fetchValue('SELECT amount FROM purchases WHERE id=?',[$poundId])==='94.29' && \App\Services\SupplierCredit::balance($poundSupplier)==='84.29','Combined line amounts flow into purchase totals and supplier credit');
+    foreach(['A4','A5','88mm','80mm','58mm'] as $paper){
+        $printSettings=\App\Services\VoucherSettings::get();$printSettings['paper_size']=$paper;$printSettings['show_weight']=false;
+        DB::statement('UPDATE voucher_settings SET settings=? WHERE id=1',[json_encode($printSettings)]);
+        $printed=request('/voucher/'.$poundId);
+        check(str_contains($printed['body'],'Qty (အိတ်)') && str_contains($printed['body'],'Price / lb') && str_contains($printed['body'],'1.99') && str_contains($printed['body'],'94.29') && str_contains($printed['body'],'Weight (lb)'),'Voucher prints bags, pound prices and charged weight: '.$paper);
+    }
+    $detail=request('/purchase/'.$poundId);$editForm=request('/purchase/'.$poundId.'/edit');
+    check(str_contains($detail['body'],'Qty (အိတ်)') && str_contains($editForm['body'],'[quantity_bag]') && str_contains($editForm['body'],'value="7.000"') && str_contains($editForm['body'],'value="1.99"'),'Purchase details and edit form retain the new line fields');
+    $poundData['items'][0]['price_lb']='2.50';$poundData['items'][0]['quantity_bag']='8';
+    \App\Services\Purchase::record($poundData,$owner,$poundId,1);
+    check(\App\Services\Purchase::items($poundId)[0]['quantity_bag']==='8.000' && \App\Services\Purchase::items($poundId)[0]['price_lb']==='2.50','Purchase edits save new bag quantities and pound prices');
+    foreach(['price_lb'=>['-1','1.234',[]],'quantity_bag'=>['-1','1.2345',[]]] as $field=>$invalidValues)foreach($invalidValues as $invalidValue){
+        $invalid=$poundData;$invalid['request_key']=bin2hex(random_bytes(32));$invalid['items'][0][$field]=$invalidValue;
+        try{\App\Services\Purchase::record($invalid,$owner);throw new RuntimeException('Invalid new line input should fail');}catch(InvalidArgumentException $error){}
+    }
+    check((int)DB::fetchValue('SELECT COUNT(*) FROM purchases WHERE supplier_id=?',[$poundSupplier])===1,'Invalid bag quantities and pound prices create no purchase records');
     echo "\nAll integration checks passed.\n";
 } finally {
     foreach($testLogos as $file){$path=\App\Services\VoucherSettings::logoPath($file);if($path && is_file($path))unlink($path);}
