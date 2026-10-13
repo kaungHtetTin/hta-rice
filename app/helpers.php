@@ -34,7 +34,8 @@ function select_field(string $name, string $label, array $rows, mixed $selected 
 function locale(): string { return \App\Services\Locale::current(); }
 function t(string $message,array $parameters=[]): string { return \App\Services\Locale::translate($message,$parameters); }
 function locale_scripts(): string {
-    return '<script id="locale-data" type="application/json">'.json_encode(['locale'=>locale(),'messages'=>\App\Services\Locale::catalog(locale())],JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_UNESCAPED_UNICODE).'</script><script src="'.e(asset('js/locale.js')).'"></script>';
+    $script=asset('js/locale.js').'?v='.filemtime(BASE_PATH.'/public/assets/js/locale.js');
+    return '<script id="locale-data" type="application/json">'.json_encode(['locale'=>locale(),'messages'=>\App\Services\Locale::catalog(locale())],JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_UNESCAPED_UNICODE).'</script><script src="'.e($script).'"></script>';
 }
 
 function locale_date(string $format,?int $timestamp=null): string {

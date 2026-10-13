@@ -23,4 +23,19 @@
     },true);
     const clear=event=>{if(event.target.dataset.localeValidity){event.target.setCustomValidity('');delete event.target.dataset.localeValidity;}};
     document.addEventListener('input',clear,true);document.addEventListener('change',clear,true);
+    document.addEventListener('change',event=>{
+        const select=event.target;
+        if(!select.matches('.language-switch select[name="locale"]'))return;
+        const form=select.form;
+        if(form.dataset.submitting)return;
+        form.dataset.submitting='true';
+        form.setAttribute('aria-busy','true');
+        form.requestSubmit();
+    });
+    window.addEventListener('pageshow',()=>{
+        document.querySelectorAll('.language-switch').forEach(form=>{
+            delete form.dataset.submitting;
+            form.removeAttribute('aria-busy');
+        });
+    });
 })();
