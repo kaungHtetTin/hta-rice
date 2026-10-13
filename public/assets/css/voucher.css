@@ -16,3 +16,11 @@
 
 .voucher[data-receipt="false"] th.number{white-space:normal}
 .voucher[data-receipt="false"] th:nth-child(3){white-space:nowrap}
+
+/* Keep supplier and warehouse details compact on screen and paper. */
+.voucher .voucher-details{margin:12px 0;gap:16px;break-inside:avoid}
+.voucher .voucher-details p{margin:0;font-size:12px;font-weight:400;line-height:1.5;overflow-wrap:anywhere}
+.voucher .voucher-details p+p{margin-top:2px}
+.voucher[data-receipt=true] .voucher-details{margin:8px 0}
+.voucher[data-receipt=true] .voucher-details>div+div{margin-top:6px}
+.voucher[data-receipt=true] .voucher-details p{font-size:10px}
