@@ -33,7 +33,7 @@ Protect forms with `csrf_field()`. Escape output with `e()`.
 Use `Mini\Database` for prepared queries. Add migration files to `migrations/`
 returning `['up' => ['SQL...'], 'down' => ['SQL...']]`, then run
 `php bin/console migrate`. The console also supports `migrate:status`,
-`migrate:rollback`, and `db:seed` (defined in `database/seed.php`).
+`migrate:rollback`, `migrate:fresh`, and `db:seed` (defined in `database/seed.php`).
 Migration commands target MySQL and may create the configured database.
 MySQL DDL is not transactional; review migration SQL before running it.
 

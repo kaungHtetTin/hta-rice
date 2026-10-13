@@ -12,6 +12,8 @@ A PHP 8.2+ / MySQL rice inventory application for XAMPP, built on the included M
 
 The migration has already been applied to the local `rice_ledger` database. No demo business records are inserted.
 
+To rebuild the database, run `php bin/console migrate:fresh`. This deletes all tables and business data in the configured `DB_DATABASE`, then runs every migration. Type the database name when prompted to confirm. Add `--seed` to recreate the owner from the `ADMIN_*` settings, or `--force` to skip the prompt for automation. Without `--seed`, create the owner through `/setup` or run `php bin/console db:seed` afterward.
+
 Alternatively, run `php -S localhost:8000 -t public public/router.php` and open `http://localhost:8000/setup`. For deployment, serve `public/` as the document root, configure HTTPS, and keep `APP_DEBUG=false`.
 
 ## Business rules

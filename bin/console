@@ -33,7 +33,36 @@ try {
         exit(0);
     }
 
-    if ($command === 'migrate') {
+    if ($command === 'migrate:fresh') {
+        if (!in_array('--force', $argv, true)) {
+            echo "This will delete ALL tables and data in database {$databaseName}.\n";
+            echo "Type the database name to continue: ";
+            $confirmation = fgets(STDIN);
+            if ($confirmation === false || trim($confirmation) !== $databaseName) {
+                echo "Cancelled. Database unchanged.\n";
+                exit(1);
+            }
+        }
+        if (in_array('--seed', $argv, true) && !is_file(BASE_PATH . '/database/seed.php')) {
+            throw new RuntimeException('No database/seed.php has been defined.');
+        }
+        ensureDatabase($databaseName);
+        $pdo = Database::connection();
+        $tables = $pdo->query("SHOW FULL TABLES WHERE Table_type = 'BASE TABLE'")->fetchAll(PDO::FETCH_COLUMN);
+        $foreignKeyChecks = (int) $pdo->query('SELECT @@SESSION.FOREIGN_KEY_CHECKS')->fetchColumn();
+        $pdo->exec('SET FOREIGN_KEY_CHECKS = 0');
+        try {
+            foreach ($tables as $table) {
+                $identifier = str_replace('`', '``', $table);
+                $pdo->exec("DROP TABLE `{$identifier}`");
+                echo "DROP  {$table}\n";
+            }
+        } finally {
+            $pdo->exec('SET FOREIGN_KEY_CHECKS = ' . $foreignKeyChecks);
+        }
+    }
+
+    if ($command === 'migrate' || $command === 'migrate:fresh') {
         ensureDatabase($databaseName);
         $pdo = Database::connection();
         $applied = $pdo->query('SELECT migration FROM migrations')->fetchAll(PDO::FETCH_COLUMN);
@@ -59,6 +88,9 @@ try {
             }
         }
         echo $count ? "Applied {$count} migration(s).\n" : "Database is up to date.\n";
+        if ($command === 'migrate:fresh' && in_array('--seed', $argv, true)) {
+            require BASE_PATH . '/database/seed.php';
+        }
         exit(0);
     }
 
@@ -105,6 +137,7 @@ try {
     echo "Mini PHP console\n\n";
     echo "  php bin/console new <directory>\n";
     echo "  php bin/console migrate\n";
+    echo "  php bin/console migrate:fresh [--seed] [--force]\n";
     echo "  php bin/console migrate:status\n";
     echo "  php bin/console migrate:rollback\n";
     echo "  php bin/console db:seed\n";
